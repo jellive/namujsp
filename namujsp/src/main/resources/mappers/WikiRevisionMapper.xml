@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jell.namujsp.dao.WikiRevisionMapper">
+
+    <!-- Result Map -->
+    <resultMap id="WikiRevisionResultMap" type="WikiRevision">
+        <id property="revisionId" column="revision_id"/>
+        <result property="docId" column="doc_id"/>
+        <result property="content" column="content"/>
+        <result property="editorName" column="editor_name"/>
+        <result property="editorIp" column="editor_ip"/>
+        <result property="revisionComment" column="revision_comment"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- 리비전 조회 by ID -->
+    <select id="findById" resultMap="WikiRevisionResultMap">
+        SELECT revision_id, doc_id, content, editor_name, editor_ip, revision_comment, created_at
+        FROM wiki_revision
+        WHERE revision_id = #{revisionId}
+    </select>
+
+    <!-- 특정 문서의 모든 리비전 조회 -->
+    <select id="findByDocId" resultMap="WikiRevisionResultMap">
+        SELECT revision_id, doc_id, content, editor_name, editor_ip, revision_comment, created_at
+        FROM wiki_revision
+        WHERE doc_id = #{docId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 특정 문서의 최신 리비전 조회 -->
+    <select id="findLatestByDocId" resultMap="WikiRevisionResultMap">
+        SELECT revision_id, doc_id, content, editor_name, editor_ip, revision_comment, created_at
+        FROM wiki_revision
+        WHERE doc_id = #{docId}
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <!-- 리비전 생성 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="revisionId" keyColumn="revision_id">
+        INSERT INTO wiki_revision (doc_id, content, editor_name, editor_ip, revision_comment, created_at)
+        VALUES (#{docId}, #{content}, #{editorName}, #{editorIp}, #{revisionComment}, CURRENT_TIMESTAMP)
+    </insert>
+
+    <!-- 리비전 삭제 -->
+    <delete id="delete">
+        DELETE FROM wiki_revision
+        WHERE revision_id = #{revisionId}
+    </delete>
+
+    <!-- 특정 문서의 리비전 개수 -->
+    <select id="countByDocId" resultType="int">
+        SELECT COUNT(*)
+        FROM wiki_revision
+        WHERE doc_id = #{docId}
+    </select>
+
+</mapper>
