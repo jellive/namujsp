@@ -6,13 +6,21 @@
 
 ## 기술 스택
 
-- **Java**: 17
-- **Framework**: Spring 5.3.30 (Spring MVC)
-- **Database**: PostgreSQL
-- **ORM**: MyBatis 3.5.13
-- **Connection Pool**: HikariCP
+### Production
+- **Java**: 21 (최신 LTS)
+- **Framework**: Spring 6.1.14 (Spring MVC)
+- **Jakarta EE**: Jakarta Servlet 6.0, Jakarta JSTL 3.0
+- **Database**: PostgreSQL 16
+- **ORM**: MyBatis 3.5.16
+- **Connection Pool**: HikariCP 6.0
 - **View**: JSP + JSTL
 - **Build Tool**: Maven
+
+### Testing
+- **Unit Test**: JUnit 5.11, Mockito 5.14, AssertJ 3.26
+- **Integration Test**: TestContainers 1.20 (PostgreSQL)
+- **E2E Test**: Selenium WebDriver 4.26
+- **Code Coverage**: JaCoCo 0.8.12
 
 ## 주요 기능
 
@@ -100,10 +108,10 @@ namujsp/
 ## 설치 및 실행
 
 ### 1. 사전 요구사항
-- Java 17 이상
-- PostgreSQL 12 이상
-- Maven 3.6 이상
-- Tomcat 9 이상 (또는 다른 서블릿 컨테이너)
+- Java 21 이상
+- PostgreSQL 16 이상
+- Maven 3.9 이상
+- Tomcat 10.1 이상 (Jakarta EE 10 지원 필요)
 
 ### 2. 데이터베이스 설정
 
@@ -155,6 +163,64 @@ http://localhost:8080/namujsp/
 - `/wiki/edit/{제목}` - 문서 편집
 - `/wiki/history/{제목}` - 문서 히스토리
 
+## 테스트
+
+### 테스트 실행
+
+전체 테스트 실행:
+```bash
+cd namujsp
+mvn clean test
+```
+
+Unit Test만 실행:
+```bash
+mvn test
+```
+
+Integration Test 실행 (TestContainers 사용):
+```bash
+mvn verify
+```
+
+Code Coverage 리포트 생성:
+```bash
+mvn clean test jacoco:report
+# 리포트 확인: target/site/jacoco/index.html
+```
+
+### 테스트 구조
+
+**1. Unit Tests** (TDD 방식)
+- `SeedParserTest`: Seed 문법 파서 테스트 (20+ test cases)
+- `WikiServiceTest`: 서비스 로직 테스트 (Mockito 사용)
+
+**2. Integration Tests** (TestContainers)
+- `WikiDocumentMapperIntegrationTest`: 실제 PostgreSQL 컨테이너와 DAO 레이어 통합 테스트
+
+**3. E2E Tests** (Selenium WebDriver)
+- `WikiE2ETest`: 브라우저 자동화 테스트
+  - 문서 생성, 조회, 편집, 히스토리 전체 플로우 테스트
+  - 주의: 애플리케이션 서버가 실행 중이어야 함
+
+### 테스트 커버리지
+
+JaCoCo를 사용하여 최소 50% 라인 커버리지를 유지합니다.
+
+```bash
+mvn clean test
+# 커버리지 리포트: target/site/jacoco/index.html
+```
+
+### E2E 테스트 활성화
+
+E2E 테스트는 기본적으로 `@Disabled` 상태입니다. 활성화하려면:
+
+1. 애플리케이션을 Tomcat에 배포하고 시작
+2. `WikiE2ETest.java`에서 `@Disabled` 어노테이션 제거
+3. `BASE_URL`을 실제 서버 주소로 수정
+4. 테스트 실행: `mvn test -Dtest=WikiE2ETest`
+
 ## 향후 확장 기능
 
 - [ ] 사용자 인증 시스템
@@ -165,6 +231,7 @@ http://localhost:8080/namujsp/
 - [ ] 문서 삭제 및 복구
 - [ ] 카테고리 시스템
 - [ ] 최근 변경 내역
+- [x] ~~완전한 테스트 커버리지 (Unit, Integration, E2E)~~
 
 ## 라이선스
 
